@@ -1,0 +1,210 @@
+const CATEGORIAS_FILTRO: (Categoria | "Todas")[] = [
+  "Todas",
+  "Eventos",
+  "Estágio",
+  "Monitoria",
+  "Venda de Livros",
+  "Avisos Gerais",
+];
+
+
+const AVISOS_INICIAIS: Aviso[] = [
+  {
+    id: "1",
+    titulo: "Venda de Livros de Cálculo I e II",
+    descricao:
+      "Vendo livros seminovos de Cálculo I (Stewart) e Cálculo II (Guidorizzi). Ótimo estado, com anotações. Entre em contato pelo WhatsApp ou deixe mensagem aqui.",
+    categoria: "Venda de Livros",
+    data: "10/06/2026",
+    favorito: false,
+  },
+  {
+    id: "2",
+    titulo: "Estágio em Desenvolvimento Web — TechNova",
+    descricao:
+      "A empresa TechNova está com vagas abertas para estágio em desenvolvimento web (React/Node.js). Bolsa R$ 1.200 + VT. Envie currículo para rh@technova.com.br.",
+    categoria: "Estágio",
+    data: "09/06/2026",
+    favorito: true,
+  },
+  {
+    id: "3",
+    titulo: "Monitoria de Física Experimental",
+    descricao:
+      "Monitoria gratuita de Física Experimental todas as terças e quintas das 14h às 16h na sala 203 do bloco C. Dúvidas sobre os relatórios e experimentos do semestre.",
+    categoria: "Monitoria",
+    data: "08/06/2026",
+    favorito: false,
+  },
+  {
+    id: "4",
+    titulo: "Semana Acadêmica de Computação — SECOMP 2026",
+    descricao:
+      "A SECOMP 2026 acontecerá nos dias 20 a 24 de junho. Palestras, minicursos e hackathon. Inscrições abertas no site da instituição.",
+    categoria: "Eventos",
+    data: "07/06/2026",
+    favorito: false,
+  },
+  {
+    id: "5",
+    titulo: "Prazo para Trancamento de Disciplinas",
+    descricao:
+      "O prazo para solicitação de trancamento de disciplinas encerra no dia 15/06. Acesse o portal do aluno e realize a solicitação dentro do prazo.",
+    categoria: "Avisos Gerais",
+    data: "06/06/2026",
+    favorito: false,
+  },
+  {
+    id: "6",
+    titulo: "Grupo de Estudos de Python",
+    descricao:
+      "Novo grupo de estudos de Python para iniciantes. Reuniões semanais às quartas-feiras às 18h na biblioteca. Todos os cursos são bem-vindos!",
+    categoria: "Monitoria",
+    data: "05/06/2026",
+    favorito: false,
+  },
+];
+
+ const [tela, setTela] = useState<Tela>("home");
+  const [avisos, setAvisos] = useState<Aviso[]>(AVISOS_INICIAIS);
+  const [busca, setBusca] = useState("");
+  const [categoriaFiltro, setCategoriaFiltro] = useState<Categoria | "Todas">(
+    "Todas",
+  );
+  const [modalNovo, setModalNovo] = useState(false);
+  const [avisoDetalhe, setAvisoDetalhe] = useState<Aviso | null>(null);
+  const [darkMode, setDarkMode] = useState(false);
+  const [online] = useState(true);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
+
+ function handleNovoAviso(dados: Omit<Aviso, "id" | "data" | "favorito">) {
+    const data = new Date().toLocaleDateString("pt-BR");
+    setAvisos((prev) => [
+      { id: Date.now().toString(), ...dados, data, favorito: false },
+      ...prev,
+    ]);
+  }
+
+  function handleFavoritar(id: string) {
+    setAvisos((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, favorito: !a.favorito } : a)),
+    );
+    setAvisoDetalhe((prev) =>
+      prev?.id === id ? { ...prev, favorito: !prev.favorito } : prev,
+    );
+  }
+
+  function handleExcluir(id: string) {
+    setAvisos((prev) => prev.filter((a) => a.id !== id));
+  }
+
+  function handleLimparDados() {
+    if (confirm("Tem certeza que deseja limpar todos os avisos?"))
+      setAvisos([]);
+  }
+
+   const avisosFiltrados = useMemo(
+    () =>
+      avisos.filter((a) => {
+        const matchBusca =
+          busca === "" ||
+          a.titulo.toLowerCase().includes(busca.toLowerCase()) ||
+          a.categoria.toLowerCase().includes(busca.toLowerCase());
+        const matchCat =
+          categoriaFiltro === "Todas" || a.categoria === categoriaFiltro;
+        return matchBusca && matchCat;
+      }),
+    [avisos, busca, categoriaFiltro],
+  );
+
+  const meusFavoritos = useMemo(
+    () => avisos.filter((a) => a.favorito),
+    [avisos],
+  );
+
+  const toggleBtn = (
+    <button
+      onClick={() => setDarkMode((d) => !d)}
+      className="p-2 rounded-xl bg-muted text-muted-foreground hover:bg-accent transition-colors"
+      title={darkMode ? "Modo claro" : "Modo escuro"}
+    >
+      {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
+  );
+
+  import { useState, useMemo, useEffect } from "react";
+import {
+  BookOpen,
+  Search,
+  Plus,
+  Star,
+  Home,
+  Bell,
+  Trash2,
+  Wifi,
+  WifiOff,
+  Filter,
+  Sun,
+  Moon,
+} from "lucide-react";
+import { PostItCard } from "./components/PostItCard";
+import { DetailModal } from "./components/DetailModal";
+import { NovoAvisoModal } from "./components/NovoAvisoModal";
+import type { Aviso, Categoria } from "./components/PostItCard";
+import cortichaImg from "./assets/images/postit.jpg";
+
+export default function App() {
+  return (
+    <div className="size-full flex flex-col bg-background max-w-md mx-auto relative overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
+
+        
+      </div>
+
+      <nav className="border-t border-border bg-card flex items-stretch shrink-0">
+        {(
+          [
+            { id: "home", label: "Home", icon: Home },
+            { id: "avisos", label: "Avisos", icon: Bell },
+            { id: "meus-avisos", label: "Meus Avisos", icon: Star },
+          ] as const
+        ).map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setTela(id)}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-colors ${
+              tela === id
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Icon
+              size={20}
+              fill={
+                tela === id && id === "meus-avisos" ? "currentColor" : "none"
+              }
+            />
+            <span className="text-xs">{label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {modalNovo && (
+        <NovoAvisoModal
+          onClose={() => setModalNovo(false)}
+          onSalvar={handleNovoAviso}
+        />
+      )}
+      {avisoDetalhe && (
+        <DetailModal
+          aviso={avisoDetalhe}
+          onClose={() => setAvisoDetalhe(null)}
+          onFavoritar={handleFavoritar}
+        />
+      )}
+    </div>
+  );
+}

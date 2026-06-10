@@ -1,0 +1,45 @@
+/* Scrollbar styled to palette */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 99px;
+  opacity: 0.7;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Post-it hover sway */
+@keyframes sway {
+  0%   { transform: rotate(var(--rot)) }
+  25%  { transform: rotate(calc(var(--rot) + 2deg)) }
+  75%  { transform: rotate(calc(var(--rot) - 2deg)) }
+  100% { transform: rotate(var(--rot)) }
+}
+
+/* Post-it shake (on "ver mais" click) */
+@keyframes shake {
+  0%   { transform: rotate(var(--rot)) }
+  15%  { transform: rotate(calc(var(--rot) - 5deg)) }
+  30%  { transform: rotate(calc(var(--rot) + 5deg)) }
+  45%  { transform: rotate(calc(var(--rot) - 4deg)) }
+  60%  { transform: rotate(calc(var(--rot) + 4deg)) }
+  75%  { transform: rotate(calc(var(--rot) - 2deg)) }
+  90%  { transform: rotate(calc(var(--rot) + 2deg)) }
+  100% { transform: rotate(var(--rot)) }
+}
+
+.postit-sway:hover {
+  animation: sway 0.6s ease-in-out infinite;
+}
+
+.postit-shake {
+  animation: shake 0.5s ease-in-out;
+}
